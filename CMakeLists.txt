@@ -88,69 +88,11 @@ juce_add_plugin("${PROJECT_NAME}"
     # You might want to use v${MAJOR_VERSION} here once you go to v2...
     PRODUCT_NAME "${PRODUCT_NAME}")
 
-# This lets us use our code in both the JUCE targets and our Test target
-# Without running into ODR violations
-add_library(SharedCode INTERFACE)
+add_subdirectory(source)
 
 clap_juce_extensions_plugin(TARGET "${PROJECT_NAME}"
     CLAP_ID "${BUNDLE_ID}"
     CLAP_FEATURES audio-effect)
-
-# Enable fast math, C++20 and a few other target defaults
-include(SharedCodeDefaults)
-
-
-# Manually list all .h and .cpp files for the plugin
-# If you are like me, you'll use globs for your sanity.
-# Just ensure you employ CONFIGURE_DEPENDS so the build system picks up changes
-# If you want to appease the CMake gods and avoid globs, manually add files like so:
-# set(SourceFiles Source/PluginEditor.h Source/PluginProcessor.h Source/PluginEditor.cpp Source/PluginProcessor.cpp)
-file(GLOB_RECURSE SourceFiles CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/source/*.h")
-target_sources(SharedCode INTERFACE ${SourceFiles})
-
-# Adds a BinaryData target for embedding assets into the binary
-#include(Assets)
-
-# MacOS only: Cleans up folder and target organization on Xcode.
-include(XcodePrettify)
-
-# This is where you can set preprocessor definitions for JUCE and your plugin
-target_compile_definitions(SharedCode
-    INTERFACE
-
-    # JUCE_WEB_BROWSER and JUCE_USE_CURL off by default
-    JUCE_WEB_BROWSER=0  # If you set this to 1, add `NEEDS_WEB_BROWSER TRUE` to the `juce_add_plugin` call
-    JUCE_USE_CURL=0     # If you set this to 1, add `NEEDS_CURL TRUE` to the `juce_add_plugin` call
-    JUCE_VST3_CAN_REPLACE_VST2=0
-
-    # Uncomment if you are paying for a an Indie/Pro license or releasing under GPLv3
-    # JUCE_DISPLAY_SPLASH_SCREEN=0
-
-    # lets the app known if we're Debug or Release
-    CMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE}"
-    VERSION="${CURRENT_VERSION}"
-
-    # JucePlugin_Name is for some reason doesn't use the nicer PRODUCT_NAME
-    PRODUCT_NAME_WITHOUT_VERSION="ZeeEdit-Prophet5"
-)
-
-# Link to any other modules you added (with juce_add_module) here!
-# Usually JUCE modules must have PRIVATE visibility
-# See https://github.com/juce-framework/JUCE/blob/master/docs/CMake%20API.md#juce_add_module
-# However, with Pamplejuce, you'll link modules to SharedCode with INTERFACE visibility
-# This allows the JUCE plugin targets and the Tests target to link against it
-target_link_libraries(SharedCode
-    INTERFACE
-#    Assets
-    melatonin_inspector
-    juce_audio_utils
-    juce_audio_processors
-    juce_dsp
-    juce_gui_basics
-    juce_gui_extra
-    juce::juce_recommended_config_flags
-    juce::juce_recommended_lto_flags
-    juce::juce_recommended_warning_flags)
 
 # Link the JUCE plugin targets our SharedCode target
 target_link_libraries("${PROJECT_NAME}" PRIVATE SharedCode)

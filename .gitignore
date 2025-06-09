@@ -9,4 +9,6 @@ Testing
 
 # clion cmake builds
 /cmake-build-*
-packaging/Output/*
+
+# Test project backups
+/tests/ReaperTestProject/Backups/

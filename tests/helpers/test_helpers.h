@@ -1,5 +1,5 @@
 #pragma once
-#include <PluginProcessor.h>
+#include "ZeeEdit.h"
 
 /* This is a helper function to run tests within the context of a plugin editor.
  *
@@ -19,13 +19,13 @@
    });
 
  */
-[[maybe_unused]] static void runWithinPluginEditor (const std::function<void (PluginProcessor& plugin)>& testCode)
+[[maybe_unused]] static void runWithinPluginEditor(const std::function<void (PluginProcessorBase& plugin)>& testCode)
 {
-    PluginProcessor plugin;
+    ZeeEdit plugin;
     const auto editor = plugin.createEditorIfNeeded();
 
-    testCode (plugin);
+    testCode(plugin);
 
-    plugin.editorBeingDeleted (editor);
+    plugin.editorBeingDeleted(editor);
     delete editor;
 }
