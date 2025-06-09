@@ -31,7 +31,7 @@ set(PRODUCT_NAME "ZeeEdit-Prophet5")
 set(COMPANY_NAME "Zee Software")
 
 # Change me! Used for the MacOS bundle identifier (and signing)
-set(BUNDLE_ID "com.pamplejuce.pamplejuce")
+set(BUNDLE_ID "com.zeebyezon.zeebyezon")
 
 # Change me! Set the plugin formats you want built
 # Valid choices: AAX Unity VST VST3 AU AUv3 Standalone
@@ -131,7 +131,7 @@ target_compile_definitions(SharedCode
     VERSION="${CURRENT_VERSION}"
 
     # JucePlugin_Name is for some reason doesn't use the nicer PRODUCT_NAME
-    PRODUCT_NAME_WITHOUT_VERSION="Pamplejuce"
+    PRODUCT_NAME_WITHOUT_VERSION="ZeeEdit-Prophet5"
 )
 
 # Link to any other modules you added (with juce_add_module) here!
