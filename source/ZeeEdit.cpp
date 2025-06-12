@@ -1,12 +1,20 @@
 // Created by David Bizon on 09/06/2025.
 
 #include "ZeeEdit.h"
+#include "ParameterMap.h"
 
 ZeeEdit::ZeeEdit() :
     PluginProcessorBase(),
     m_parameters(*this, nullptr, "parameters", createParameterLayout())
 {
-    m_parameters.addParameterListener("cutoff", &addParameterListener(7, 73));
+    for (const settings::WidgetPanel& panel : ParameterMap::getPanels())
+    {
+        for (const auto& widget : panel.widgets)
+        {
+            const auto parameterID = ParameterMap::generateParameterID(panel.panel.name, widget.name);
+            m_parameters.addParameterListener(parameterID, &addParameterListener(widget.midiConfig.channel, widget.midiConfig.ccNumber));
+        }
+    }
 }
 
 ZeeEdit::~ZeeEdit() = default;
@@ -14,7 +22,18 @@ ZeeEdit::~ZeeEdit() = default;
 juce::AudioProcessorValueTreeState::ParameterLayout ZeeEdit::createParameterLayout()
 {
     juce::AudioProcessorValueTreeState::ParameterLayout params;
-    params.add(std::make_unique<juce::AudioParameterFloat>("cutoff", "Cutoff", 0.0f, 120.0f, 60.0f));
+    for (const settings::WidgetPanel& panel : ParameterMap::getPanels())
+    {
+        for (const auto& widget : panel.widgets)
+        {
+            params.add(std::make_unique<juce::AudioParameterInt>(
+                ParameterMap::generateParameterID(panel.panel.name, widget.name),
+                widget.name,
+                widget.valueRange.minValue,
+                widget.valueRange.maxValue,
+                widget.valueRange.defaultValue));
+        }
+    }
     return params;
 }
 

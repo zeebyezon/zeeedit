@@ -1,21 +1,35 @@
 // Created by David Bizon on 09/06/2025.
 #pragma once
 
+#include "../ParameterMap.h" // WidgetUnit
 #include "juce_gui_basics/juce_gui_basics.h"
 #include "juce_audio_processors/juce_audio_processors.h" // juce::AudioProcessorValueTreeState
+
+namespace settings {
+struct WidgetPanel;
+}
+
+class IWidgetWithLabel;
 
 class WidgetPanel : public juce::Component
 {
 public:
-    explicit WidgetPanel(juce::AudioProcessorValueTreeState& valueTreeState);
+    explicit WidgetPanel(const settings::WidgetPanel& panel, juce::AudioProcessorValueTreeState& valueTreeState);
 
-    void resized() override;
+    int getLabelHeight() const;
+
+    void paint(juce::Graphics& g) override;
 
 private:
-    juce::AudioProcessorValueTreeState& m_valueTreeState;
-    using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
+    void populateWidgets(const settings::WidgetPanel& panel);
 
-    juce::Slider m_cutoffSlider;
-    juce::Label m_cutoffLabel;
-    std::unique_ptr<SliderAttachment> m_cutoffAttachment;
+    std::unique_ptr<IWidgetWithLabel> createRotary(const std::string& parameterID);
+    std::unique_ptr<IWidgetWithLabel> createToggle(const std::string& parameterID);
+    std::unique_ptr<IWidgetWithLabel> createSelect(const std::string& parameterID, const std::vector<std::string>& labels);
+
+private:
+    juce::Label m_panelLabel;
+    juce::AudioProcessorValueTreeState& m_valueTreeState;
+    std::vector<std::unique_ptr<IWidgetWithLabel>> m_widgets;
+    WidgetUnit m_configuredPanelWidth;
 };

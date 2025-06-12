@@ -1,23 +1,41 @@
 #include "ZeeEditGui.h"
 
-#include "../PluginProcessorBase.h"
 #include "WidgetPanel.h"
+#include "LayoutProcessor.h"
+#include "../ParameterMap.h"
+#include "../PluginProcessorBase.h"
+
+#include <melatonin_inspector/melatonin_inspector.h>
 
 ZeeEditGui::ZeeEditGui(PluginProcessorBase& pluginProcessor, juce::AudioProcessorValueTreeState& valueTreeState) :
     AudioProcessorEditor(&pluginProcessor)
 {
-    m_widgetPanel = std::make_unique<WidgetPanel>(valueTreeState);
-    addAndMakeVisible(*m_widgetPanel);
+    for (const settings::WidgetPanel& panel : ParameterMap::getPanels())
+    {
+        m_widgetPanels.push_back(std::make_unique<WidgetPanel>(panel, valueTreeState));
+        addAndMakeVisible(*m_widgetPanels.back());
+    }
 
-    setSize(400, 300);
+    LayoutProcessor layoutProcessor(1500); // 1500 pixels wide maximum for the panel
+    for (auto& panel : m_widgetPanels)
+    {
+        layoutProcessor.insert(*panel, panel->getLabelHeight());
+    }
+    setSize(layoutProcessor.getSize().getX(), layoutProcessor.getSize().getY());
+
+#if JUCE_DEBUG
+    m_inspector = std::make_unique<melatonin::Inspector>(*this);
+    m_inspector->onClose = [this]() { m_inspector.reset(); };
+    m_inspector->setVisible(true);
+#endif
 }
 
 ZeeEditGui::~ZeeEditGui() = default;
 
 void ZeeEditGui::paint(juce::Graphics& g)
 {
-    // (Our component is opaque, so we must fill the background with a solid color)
     g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
+    g.setFont(g.getCurrentFont().withHeight(11.0f));
 }
 
 void ZeeEditGui::resized()
