@@ -1,6 +1,7 @@
 // Created by David Bizon on 09/06/2025.
 
 #include "ZeeEdit.h"
+#include "GUI/ZeeEditGui.h"
 #include "ParameterMap.h"
 
 ZeeEdit::ZeeEdit() :
@@ -18,6 +19,11 @@ ZeeEdit::ZeeEdit() :
 }
 
 ZeeEdit::~ZeeEdit() = default;
+
+juce::AudioProcessorEditor* ZeeEdit::createEditor()
+{
+    return new ZeeEditGui(*this, getParameters());
+}
 
 juce::AudioProcessorValueTreeState::ParameterLayout ZeeEdit::createParameterLayout()
 {
