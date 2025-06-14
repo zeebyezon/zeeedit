@@ -25,6 +25,8 @@ WidgetPanel::WidgetPanel(const settings::WidgetPanel& panel, juce::AudioProcesso
     setSize(layoutProcessor.getSize().getX(), layoutProcessor.getSize().getY());
 }
 
+WidgetPanel::~WidgetPanel() = default;
+
 int WidgetPanel::getLabelHeight() const
 {
     return m_panelLabel.getHeight();
@@ -69,28 +71,29 @@ void WidgetPanel::populateWidgets(const settings::WidgetPanel& panel)
 
 std::unique_ptr<IWidgetWithLabel> WidgetPanel::createRotary(const std::string& parameterID)
 {
-    auto widgetWithLabel = std::make_unique<WidgetWithLabel<juce::Slider, juce::AudioProcessorValueTreeState::SliderAttachment>>(WidgetType::ROTARY);
+    auto widgetWithLabel = std::make_unique<WidgetWithLabel<juce::Slider, juce::Label, juce::AudioProcessorValueTreeState::SliderAttachment>>
+        (WidgetType::ROTARY, m_valueTreeState, parameterID);
 
     addAndMakeVisible(widgetWithLabel->widget);
     widgetWithLabel->widget.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    widgetWithLabel->attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(m_valueTreeState, parameterID, widgetWithLabel->widget);
 
     return widgetWithLabel;
 }
 
 std::unique_ptr<IWidgetWithLabel> WidgetPanel::createToggle(const std::string& parameterID)
 {
-    auto widgetWithLabel = std::make_unique<WidgetWithLabel<juce::ToggleButton, juce::AudioProcessorValueTreeState::ButtonAttachment>>(WidgetType::TOGGLE);
+    auto widgetWithLabel = std::make_unique<WidgetWithLabel<juce::ToggleButton, juce::Label, juce::AudioProcessorValueTreeState::ButtonAttachment>>
+        (WidgetType::TOGGLE, m_valueTreeState, parameterID);
 
     addAndMakeVisible(widgetWithLabel->widget);
-    widgetWithLabel->attachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(m_valueTreeState, parameterID, widgetWithLabel->widget);
 
     return widgetWithLabel;
 }
 
 std::unique_ptr<IWidgetWithLabel> WidgetPanel::createSelect(const std::string& parameterID, const std::vector<std::string>& labels)
 {
-    auto widgetWithLabel = std::make_unique<WidgetWithLabel<juce::ComboBox, juce::AudioProcessorValueTreeState::ComboBoxAttachment>>(WidgetType::SELECT);
+    auto widgetWithLabel = std::make_unique<WidgetWithLabel<juce::ComboBox, juce::Label, juce::AudioProcessorValueTreeState::ComboBoxAttachment>>
+        (WidgetType::SELECT, m_valueTreeState, parameterID);
 
     addAndMakeVisible(widgetWithLabel->widget);
     int index = 0;
@@ -100,7 +103,6 @@ std::unique_ptr<IWidgetWithLabel> WidgetPanel::createSelect(const std::string& p
             continue;
         widgetWithLabel->widget.addItem(item, ++index); // Add items with 1-based index
     }
-    widgetWithLabel->attachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(m_valueTreeState, parameterID, widgetWithLabel->widget);
 
     return widgetWithLabel;
 }

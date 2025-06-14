@@ -15,6 +15,7 @@ class WidgetPanel : public juce::Component
 {
 public:
     explicit WidgetPanel(const settings::WidgetPanel& panel, juce::AudioProcessorValueTreeState& valueTreeState);
+    ~WidgetPanel() override;
 
     int getLabelHeight() const;
 

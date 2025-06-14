@@ -1,9 +1,12 @@
 // Created by David Bizon on 12/06/2025.
 #pragma once
 
+#include <string>
+
 namespace juce {
 class Component;
 class Label;
+class AudioProcessorValueTreeState;
 }
 
 enum class WidgetType
@@ -22,15 +25,18 @@ public:
     [[nodiscard]] virtual WidgetType getWidgetType() const = 0;
 };
 
-template<class ComponentType, class AttachmentType>
+template<class Component, class Label, class Attachment>
 struct WidgetWithLabel final : IWidgetWithLabel
 {
-    ComponentType widget;
-    juce::Label label;
-    std::unique_ptr<AttachmentType> attachment;
+    Component widget;
+    Label label;
+    Attachment attachment;
     WidgetType widgetType;
 
-    explicit WidgetWithLabel(WidgetType type) : widgetType(type) {}
+    WidgetWithLabel(WidgetType type, juce::AudioProcessorValueTreeState& valueTreeState, const std::string& parameterID) :
+        attachment(valueTreeState, parameterID, widget),
+        widgetType(type)
+    {}
     ~WidgetWithLabel() override = default;
     [[nodiscard]] juce::Component& getComponent() override { return widget; }
     [[nodiscard]] juce::Label& getLabel() override { return label; }
