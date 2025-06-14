@@ -1,6 +1,7 @@
 // Created by David Bizon on 10/06/2025.
 
 #include "ParameterMap.h"
+#include <algorithm> // std::remove_if
 
 inline WidgetUnit operator"" _w(unsigned long long int value) { return WidgetUnit(static_cast<int>(value)); }
 
