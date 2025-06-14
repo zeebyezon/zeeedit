@@ -1,5 +1,4 @@
 #include "PluginProcessorBase.h"
-#include "GUI/ZeeEditGui.h"
 #include "AudioStub.h"
 
 //==============================================================================
@@ -130,11 +129,6 @@ void PluginProcessorBase::processBlock(juce::AudioBuffer<float>& buffer, juce::M
 bool PluginProcessorBase::hasEditor() const
 {
     return true; // (change this to false if you choose to not supply an editor)
-}
-
-juce::AudioProcessorEditor* PluginProcessorBase::createEditor()
-{
-    return new ZeeEditGui(*this, getParameters());
 }
 
 //==============================================================================

@@ -17,6 +17,8 @@ public:
     ZeeEdit();
     ~ZeeEdit() override;
 
+    juce::AudioProcessorEditor* createEditor() override;
+
     void pushMessage(juce::MidiMessage message);
 
 protected:
