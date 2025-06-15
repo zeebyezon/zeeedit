@@ -10,18 +10,15 @@
 ZeeEditGui::ZeeEditGui(PluginProcessorBase& pluginProcessor, juce::AudioProcessorValueTreeState& valueTreeState) :
     AudioProcessorEditor(&pluginProcessor)
 {
+    // Create the widget panels
     for (const settings::WidgetPanel& panel : ParameterMap::getPanels())
     {
         m_widgetPanels.push_back(std::make_unique<WidgetPanel>(panel, valueTreeState));
         addAndMakeVisible(*m_widgetPanels.back());
     }
 
-    LayoutProcessor layoutProcessor(1500); // 1500 pixels wide maximum for the panel
-    for (auto& panel : m_widgetPanels)
-    {
-        layoutProcessor.insert(*panel, panel->getLabelHeight());
-    }
-    setSize(layoutProcessor.getSize().getX(), layoutProcessor.getSize().getY());
+    setSize(1140, 800); // Set a default size for the editor
+    setResizable (true, false);
 
 #if JUCE_DEBUG
     m_inspector = std::make_unique<melatonin::Inspector>(*this);
@@ -40,4 +37,9 @@ void ZeeEditGui::paint(juce::Graphics& g)
 
 void ZeeEditGui::resized()
 {
+    LayoutProcessor layoutProcessor(getWidth());
+    for (auto& panel : m_widgetPanels)
+    {
+        layoutProcessor.insert(*panel, panel->getLabelHeight());
+    }
 }
