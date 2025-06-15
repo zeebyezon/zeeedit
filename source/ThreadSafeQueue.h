@@ -1,39 +1,50 @@
-// Created by David Bizon on 09/06/2025.
+// Created by David Bizon on 15/06/2025.
 #pragma once
 
-#include <queue>
-#include <mutex>
-#include <functional>
+#include "juce_audio_basics/juce_audio_basics.h" // MidiMessage
+#include "juce_core/juce_core.h" // AbstractFifo
 
 template<class T>
 class ThreadSafeQueue
 {
 public:
-    ThreadSafeQueue() :
-        m_queue(),
-        m_queueMutex()
+    explicit ThreadSafeQueue(int queueSize) :
+        m_abstractFifo(queueSize),
+        m_midiMessageBuffer(queueSize)
     {
+        jassert(queueSize > 0);
     }
 
     ~ThreadSafeQueue() = default;
 
-    void push(T t)
+    bool push(T t)
     {
-        std::lock_guard<std::mutex> lock(m_queueMutex);
-        m_queue.push(t);
+        const auto scope = m_abstractFifo.write(1);
+
+        if (scope.blockSize1 > 0)
+            m_midiMessageBuffer[scope.startIndex1] = std::move(t);
+        else if (scope.blockSize2 > 0)
+            m_midiMessageBuffer[scope.startIndex2] = std::move(t);
+        else
+            return false;
+
+        return true;
     }
 
-    void popAll(std::function<void(const T&)> f)
+    void popAll(std::function<void(T)> readFunction)
     {
-        std::unique_lock<std::mutex> lock(m_queueMutex);
-        while (!m_queue.empty())
+        while (m_abstractFifo.getNumReady() > 0)
         {
-            f(m_queue.front());
-            m_queue.pop();
+            const auto scope = m_abstractFifo.read(1);
+
+            if (scope.blockSize1 > 0)
+                readFunction(std::move(m_midiMessageBuffer[scope.startIndex1]));
+            if (scope.blockSize2 > 0)
+                readFunction(std::move(m_midiMessageBuffer[scope.startIndex2]));
         }
     }
 
 private:
-    std::queue<T> m_queue;
-    mutable std::mutex m_queueMutex;
+    juce::AbstractFifo m_abstractFifo;
+    std::vector<T> m_midiMessageBuffer;
 };

@@ -4,16 +4,18 @@
 #include "LayoutProcessor.h"
 #include "../ParameterMap.h"
 #include "../PluginProcessorBase.h"
+#include "../ThreadSafeQueue.h"
 
 #include <melatonin_inspector/melatonin_inspector.h>
 
-ZeeEditGui::ZeeEditGui(PluginProcessorBase& pluginProcessor, juce::AudioProcessorValueTreeState& valueTreeState) :
-    AudioProcessorEditor(&pluginProcessor)
+ZeeEditGui::ZeeEditGui(PluginProcessorBase& pluginProcessor, juce::AudioProcessorValueTreeState& valueTreeState, ThreadSafeQueue<juce::MidiBuffer>& inputMidiMessageQueue) :
+    AudioProcessorEditor(&pluginProcessor),
+    m_inputMidiMessageQueue(inputMidiMessageQueue)
 {
     // Create the widget panels
     for (const settings::WidgetPanel& panel : ParameterMap::getPanels())
     {
-        m_widgetPanels.push_back(std::make_unique<WidgetPanel>(panel, valueTreeState));
+        m_widgetPanels.push_back(std::make_unique<WidgetPanel>(panel, valueTreeState, m_midiParameterMap));
         addAndMakeVisible(*m_widgetPanels.back());
     }
 
@@ -42,4 +44,15 @@ void ZeeEditGui::resized()
     {
         layoutProcessor.insert(*panel, panel->getLabelHeight());
     }
+}
+
+void ZeeEditGui::changeListenerCallback(juce::ChangeBroadcaster* /*source*/)
+{
+    m_inputMidiMessageQueue.popAll([this](const juce::MidiBuffer& midiBuffer)
+    {
+        for (const juce::MidiMessageMetadata& midiMessageMetadata : midiBuffer)
+        {
+            m_midiParameterMap.setParameterValue(midiMessageMetadata.getMessage());
+        }
+    });
 }

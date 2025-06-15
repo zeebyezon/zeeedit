@@ -4,9 +4,10 @@
 
 #include "LayoutProcessor.h"
 #include "WidgetWithLabel.h"
+#include "MidiParameterMap.h"
 #include "../ParameterMap.h"
 
-WidgetPanel::WidgetPanel(const settings::WidgetPanel& panel, juce::AudioProcessorValueTreeState& valueTreeState) :
+WidgetPanel::WidgetPanel(const settings::WidgetPanel& panel, juce::AudioProcessorValueTreeState& valueTreeState, MidiParameterMap& midiParameterMap) :
     m_valueTreeState(valueTreeState),
     m_configuredPanelWidth(panel.panel.width)
 {
@@ -14,7 +15,7 @@ WidgetPanel::WidgetPanel(const settings::WidgetPanel& panel, juce::AudioProcesso
     m_panelLabel.setJustificationType(juce::Justification::centred);
     m_panelLabel.attachToComponent(this, false);
 
-    populateWidgets(panel);
+    populateWidgets(panel, midiParameterMap);
 
     LayoutProcessor layoutProcessor(m_configuredPanelWidth);
     for (const std::unique_ptr<IWidgetWithLabel>& widget : m_widgets)
@@ -39,7 +40,7 @@ void WidgetPanel::paint(juce::Graphics& g)
     g.drawRoundedRectangle(getLocalBounds().toFloat(), 10, 2);
 }
 
-void WidgetPanel::populateWidgets(const settings::WidgetPanel& panel)
+void WidgetPanel::populateWidgets(const settings::WidgetPanel& panel, MidiParameterMap& midiParameterMap)
 {
     m_widgets.reserve(panel.widgets.size());
     for (const auto& widget : panel.widgets)
@@ -64,6 +65,9 @@ void WidgetPanel::populateWidgets(const settings::WidgetPanel& panel)
         widgetWithLabel->getLabel().setText(widget.name, juce::dontSendNotification);
         widgetWithLabel->getLabel().setJustificationType(juce::Justification::centred);
         widgetWithLabel->getLabel().attachToComponent(&widgetWithLabel->getComponent(), false);
+
+        // register fo modification on input midi messages
+        midiParameterMap.registerParameter(widget.midiConfig, widget.valueRange, *m_valueTreeState.getParameter(parameterID));
 
         m_widgets.push_back(std::move(widgetWithLabel));
     }
