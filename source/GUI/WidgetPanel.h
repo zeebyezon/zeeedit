@@ -10,11 +10,12 @@ struct WidgetPanel;
 }
 
 class IWidgetWithLabel;
+class MidiParameterMap;
 
 class WidgetPanel : public juce::Component
 {
 public:
-    explicit WidgetPanel(const settings::WidgetPanel& panel, juce::AudioProcessorValueTreeState& valueTreeState);
+    explicit WidgetPanel(const settings::WidgetPanel& panel, juce::AudioProcessorValueTreeState& valueTreeState, MidiParameterMap& midiParameterMap);
     ~WidgetPanel() override;
 
     int getLabelHeight() const;
@@ -22,7 +23,7 @@ public:
     void paint(juce::Graphics& g) override;
 
 private:
-    void populateWidgets(const settings::WidgetPanel& panel);
+    void populateWidgets(const settings::WidgetPanel& panel, MidiParameterMap& midiParameterMap);
 
     std::unique_ptr<IWidgetWithLabel> createRotary(const std::string& parameterID);
     std::unique_ptr<IWidgetWithLabel> createToggle(const std::string& parameterID);

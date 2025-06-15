@@ -3,24 +3,10 @@ add_library(SharedCode INTERFACE)
 # Enable fast math, C++20 and a few other target defaults
 include(SharedCodeDefaults)
 
-target_sources(SharedCode INTERFACE
-    "${CMAKE_CURRENT_SOURCE_DIR}/AudioStub.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/AudioStub.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/ParameterMap.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/ParameterMap.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/PluginProcessorBase.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/PluginProcessorBase.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/ThreadSafeQueue.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/ZeeEdit.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/ZeeEdit.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/GUI/LayoutProcessor.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/GUI/LayoutProcessor.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/GUI/WidgetPanel.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/GUI/WidgetPanel.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/GUI/WidgetWithLabel.h"
-    "${CMAKE_CURRENT_SOURCE_DIR}/GUI/ZeeEditGui.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/GUI/ZeeEditGui.h"
-)
+file(GLOB_RECURSE AppSources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
+file(GLOB_RECURSE GuiSources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/GUI/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/GUI/*.h")
+
+target_sources(SharedCode INTERFACE ${AppSources} ${GuiSources})
 
 # Adds a BinaryData target for embedding assets into the binary
 #include(Assets)
