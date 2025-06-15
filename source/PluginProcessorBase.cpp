@@ -84,15 +84,13 @@ void PluginProcessorBase::changeProgramName(int index, const juce::String& newNa
 //==============================================================================
 void PluginProcessorBase::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    // Use this method as the place to do any pre-playback initialization that you need
     juce::ignoreUnused(sampleRate, samplesPerBlock);
 }
 
 void PluginProcessorBase::releaseResources()
 {
-    // When playback stops, you can use this as an opportunity to free up any
-    // spare memory, etc.
+    // When playback stops, you can use this as an opportunity to free up any spare memory, etc.
 }
 
 bool PluginProcessorBase::isBusesLayoutSupported(const BusesLayout& layouts) const
@@ -119,7 +117,7 @@ bool PluginProcessorBase::isBusesLayoutSupported(const BusesLayout& layouts) con
 
 void PluginProcessorBase::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    // Actually, the buffer has zero channel because this is a MIDI effect. So this call is not necessary.
+    // Actually, the buffer has zero channels because this is a MIDI effect. So this call is not necessary.
     AudioStub::passthroughAudio(buffer, getTotalNumInputChannels(), getTotalNumOutputChannels());
 
     processMidiMessages(midiMessages);
@@ -142,7 +140,7 @@ void PluginProcessorBase::getStateInformation(juce::MemoryBlock& destData)
 void PluginProcessorBase::setStateInformation(const void* data, int sizeInBytes)
 {
     std::unique_ptr<juce::XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
-    if (xmlState.get() != nullptr)
+    if (xmlState != nullptr)
     {
         if (xmlState->hasTagName(getParameters().state.getType()))
         {
