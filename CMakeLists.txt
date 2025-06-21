@@ -50,8 +50,8 @@ add_subdirectory(JUCE)
 add_subdirectory(modules/clap-juce-extensions EXCLUDE_FROM_ALL)
 
 # Customize the installation path
-set_directory_properties(PROPERTIES JUCE_VST_COPY_DIR "D:/Studio/VST2")
-set_directory_properties(PROPERTIES JUCE_VST3_COPY_DIR "D:/Studio/VST3")
+set_directory_properties(PROPERTIES JUCE_VST_COPY_DIR "D:/Studio/VST-mine")
+set_directory_properties(PROPERTIES JUCE_VST3_COPY_DIR "D:/Studio/VST-mine")
 
 # Add any other modules you want modules here, before the juce_add_plugin call
 # juce_add_module(modules/my_module)
