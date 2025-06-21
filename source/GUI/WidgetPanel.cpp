@@ -97,16 +97,17 @@ std::unique_ptr<IWidgetWithLabel> WidgetPanel::createToggle(const std::string& p
 std::unique_ptr<IWidgetWithLabel> WidgetPanel::createSelect(const std::string& parameterID, const std::vector<std::string>& labels)
 {
     auto widgetWithLabel = std::make_unique<WidgetWithLabel<juce::ComboBox, juce::Label, juce::AudioProcessorValueTreeState::ComboBoxAttachment>>
-        (WidgetType::SELECT, m_valueTreeState, parameterID);
+        (WidgetType::SELECT, m_valueTreeState, parameterID, [&labels](juce::ComboBox& selector) {
+        int index = 0;
+        for (const std::string& item : labels)
+        {
+            if (item.empty())
+                continue;
+            selector.addItem(item, ++index); // Add items with 1-based index
+        }
+    });
 
     addAndMakeVisible(widgetWithLabel->widget);
-    int index = 0;
-    for (const std::string& item : labels)
-    {
-        if (item.empty())
-            continue;
-        widgetWithLabel->widget.addItem(item, ++index); // Add items with 1-based index
-    }
 
     return widgetWithLabel;
 }
