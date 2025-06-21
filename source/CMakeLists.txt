@@ -23,10 +23,6 @@ target_compile_definitions(SharedCode
     JUCE_USE_CURL=0     # If you set this to 1, add `NEEDS_CURL TRUE` to the `juce_add_plugin` call
     JUCE_VST3_CAN_REPLACE_VST2=0
 
-    JucePlugin_IsMidiEffect=1
-    JucePlugin_WantsMidiInput=1
-    JucePlugin_ProducesMidiOutput=1
-
     # Uncomment if you are paying for a an Indie/Pro license or releasing under GPLv3
     # JUCE_DISPLAY_SPLASH_SCREEN=0
 
