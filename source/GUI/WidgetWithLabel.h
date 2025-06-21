@@ -36,7 +36,17 @@ struct WidgetWithLabel final : IWidgetWithLabel
     WidgetWithLabel(WidgetType type, juce::AudioProcessorValueTreeState& valueTreeState, const std::string& parameterID) :
         attachment(valueTreeState, parameterID, widget),
         widgetType(type)
+    {
+    }
+
+    /**
+     * Provide a function to initialize the widget before passing it to the attachment.
+     */
+    WidgetWithLabel(WidgetType type, juce::AudioProcessorValueTreeState& valueTreeState, const std::string& parameterID, std::function<void(Component& widget)> initWidget) :
+        attachment(valueTreeState, parameterID, (initWidget(widget), widget)),
+        widgetType(type)
     {}
+
     ~WidgetWithLabel() override = default;
     [[nodiscard]] juce::Component& getComponent() override { return widget; }
     [[nodiscard]] juce::Label& getLabel() override { return label; }
