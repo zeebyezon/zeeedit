@@ -12,7 +12,7 @@ class WidgetPanel;
 template<class T> class ThreadSafeQueue;
 
 //==============================================================================
-class ZeeEditGui : public juce::AudioProcessorEditor, public juce::ChangeListener
+class ZeeEditGui : public juce::AudioProcessorEditor, public juce::Timer
 {
 public:
     ZeeEditGui(PluginProcessorBase& pluginProcessor, juce::AudioProcessorValueTreeState& valueTreeState, ThreadSafeQueue<juce::MidiBuffer>& inputMidiMessageQueue);
@@ -23,7 +23,7 @@ public:
     void resized() override;
 
     //==============================================================================
-    void changeListenerCallback(juce::ChangeBroadcaster* source) override;
+    void timerCallback() override;
 
 private:
     std::vector<std::unique_ptr<WidgetPanel>> m_widgetPanels;

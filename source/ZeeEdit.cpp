@@ -85,7 +85,6 @@ void ZeeEdit::processMidiMessages(juce::MidiBuffer& midiMessages)
     if (!inputBuffer.isEmpty())
     {
         m_inputMidiMessageQueue.push(std::move(inputBuffer));
-        sendChangeMessage();
     }
 
     m_outputMidiMessageQueue.popAll([&midiMessages](const juce::MidiMessage& midiMessage)
@@ -103,7 +102,5 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 juce::AudioProcessorEditor* ZeeEdit::createEditor()
 {
-    auto gui = new ZeeEditGui(*this, m_parameters, m_inputMidiMessageQueue);
-    addChangeListener(gui);
-    return gui;
+    return new ZeeEditGui(*this, m_parameters, m_inputMidiMessageQueue);
 }

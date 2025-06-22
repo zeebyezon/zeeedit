@@ -11,7 +11,7 @@ class AudioPlayHead;
 class MidiBuffer;
 }
 
-class ZeeEdit : public PluginProcessorBase, public juce::ChangeBroadcaster
+class ZeeEdit : public PluginProcessorBase
 {
 public:
     ZeeEdit();
