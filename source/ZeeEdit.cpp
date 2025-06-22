@@ -23,7 +23,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout ZeeEdit::createParameterLayo
         {
             params.add(std::make_unique<juce::AudioParameterInt>(
                 ParameterMap::generateParameterID(panel.panel.name, widget.name),
-                widget.name,
+                panel.panel.name + ": " + widget.name,
                 widget.valueRange.minValue,
                 widget.valueRange.maxValue,
                 widget.valueRange.defaultValue));
