@@ -13,8 +13,8 @@ class IWidgetWithLabel;
 class LayoutProcessor
 {
 public:
-    explicit LayoutProcessor(WidgetUnit panelWidth);
-    explicit LayoutProcessor(int panelWidth);
+    LayoutProcessor(int top, WidgetUnit panelWidth);
+    LayoutProcessor(int top, int panelWidth);
 
     void reset();
     void insert(IWidgetWithLabel& widget);

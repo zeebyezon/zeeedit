@@ -21,6 +21,8 @@ public:
 
     void pushOutputMessage(juce::MidiMessage message);
 
+    int getGlobalMidiChannel() const;
+
 protected:
     juce::AudioProcessorValueTreeState& getParameters() override { return m_parameters; }
     void processMidiMessages(juce::MidiBuffer& midiMessages) override;

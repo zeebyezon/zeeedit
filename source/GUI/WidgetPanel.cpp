@@ -17,7 +17,7 @@ WidgetPanel::WidgetPanel(const settings::WidgetPanel& panel, juce::AudioProcesso
 
     populateWidgets(panel, midiParameterMap);
 
-    LayoutProcessor layoutProcessor(m_configuredPanelWidth);
+    LayoutProcessor layoutProcessor(0, m_configuredPanelWidth);
     for (const std::unique_ptr<IWidgetWithLabel>& widget : m_widgets)
     {
         layoutProcessor.insert(*widget);
@@ -67,7 +67,7 @@ void WidgetPanel::populateWidgets(const settings::WidgetPanel& panel, MidiParame
         widgetWithLabel->getLabel().attachToComponent(&widgetWithLabel->getComponent(), false);
 
         // register fo modification on input midi messages
-        midiParameterMap.registerParameter(widget.midiConfig, widget.valueRange, *m_valueTreeState.getParameter(parameterID));
+        midiParameterMap.registerParameter(widget.midiConfig, *m_valueTreeState.getParameter(parameterID));
 
         m_widgets.push_back(std::move(widgetWithLabel));
     }

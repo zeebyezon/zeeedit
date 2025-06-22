@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MidiParameterMap.h"
+#include "WidgetWithLabel.h"
 #include <juce_audio_processors/juce_audio_processors.h>
 
 namespace melatonin {
@@ -26,6 +27,10 @@ public:
     void timerCallback() override;
 
 private:
+    // Header
+    WidgetWithLabel<juce::ComboBox, juce::Label, juce::AudioProcessorValueTreeState::ComboBoxAttachment> m_midiChannelSelector;
+
+    // Widgets
     std::vector<std::unique_ptr<WidgetPanel>> m_widgetPanels;
     ThreadSafeQueue<juce::MidiBuffer>& m_inputMidiMessageQueue;
     MidiParameterMap m_midiParameterMap;

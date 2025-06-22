@@ -15,14 +15,14 @@ int LayoutProcessor::getValueTextBoxHeight()
     return VALUE_HEIGHT;
 }
 
-LayoutProcessor::LayoutProcessor(WidgetUnit panelWidth) :
-    LayoutProcessor((H_SPACING + WIDGET_UNIT) * panelWidth.getRawValue() + H_SPACING)
+LayoutProcessor::LayoutProcessor(int top, WidgetUnit panelWidth) :
+    LayoutProcessor(top, (H_SPACING + WIDGET_UNIT) * panelWidth.getRawValue() + H_SPACING)
 {
 }
 
-LayoutProcessor::LayoutProcessor(int panelWidth) :
+LayoutProcessor::LayoutProcessor(int top, int panelWidth) :
     m_configuredPanelWidth(panelWidth),
-    m_topLeft(H_SPACING, V_SPACING),
+    m_topLeft(H_SPACING, top + V_SPACING),
     m_maxBottomRight(m_topLeft)
 {
 }
