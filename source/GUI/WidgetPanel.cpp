@@ -61,10 +61,11 @@ void WidgetPanel::populateWidgets(const settings::WidgetPanel& panel, MidiParame
             widgetWithLabel = createRotary(parameterID);
         }
 
-        addAndMakeVisible(widgetWithLabel->getLabel());
         widgetWithLabel->getLabel().setText(widget.name, juce::dontSendNotification);
         widgetWithLabel->getLabel().setJustificationType(juce::Justification::centred);
         widgetWithLabel->getLabel().attachToComponent(&widgetWithLabel->getComponent(), false);
+        addAndMakeVisible(widgetWithLabel->getComponent());
+        addAndMakeVisible(widgetWithLabel->getLabel());
 
         // register fo modification on input midi messages
         midiParameterMap.registerParameter(widget.midiConfig, *m_valueTreeState.getParameter(parameterID));
@@ -73,28 +74,25 @@ void WidgetPanel::populateWidgets(const settings::WidgetPanel& panel, MidiParame
     }
 }
 
-std::unique_ptr<IWidgetWithLabel> WidgetPanel::createRotary(const std::string& parameterID)
+std::unique_ptr<IWidgetWithLabel> WidgetPanel::createRotary(const std::string& parameterID) const
 {
     auto widgetWithLabel = std::make_unique<WidgetWithLabel<juce::Slider, juce::Label, juce::AudioProcessorValueTreeState::SliderAttachment>>
         (WidgetType::ROTARY, m_valueTreeState, parameterID);
 
-    addAndMakeVisible(widgetWithLabel->widget);
     widgetWithLabel->widget.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
 
     return widgetWithLabel;
 }
 
-std::unique_ptr<IWidgetWithLabel> WidgetPanel::createToggle(const std::string& parameterID)
+std::unique_ptr<IWidgetWithLabel> WidgetPanel::createToggle(const std::string& parameterID) const
 {
     auto widgetWithLabel = std::make_unique<WidgetWithLabel<juce::ToggleButton, juce::Label, juce::AudioProcessorValueTreeState::ButtonAttachment>>
         (WidgetType::TOGGLE, m_valueTreeState, parameterID);
 
-    addAndMakeVisible(widgetWithLabel->widget);
-
     return widgetWithLabel;
 }
 
-std::unique_ptr<IWidgetWithLabel> WidgetPanel::createSelect(const std::string& parameterID, const std::vector<std::string>& labels)
+std::unique_ptr<IWidgetWithLabel> WidgetPanel::createSelect(const std::string& parameterID, const std::vector<std::string>& labels) const
 {
     auto widgetWithLabel = std::make_unique<WidgetWithLabel<juce::ComboBox, juce::Label, juce::AudioProcessorValueTreeState::ComboBoxAttachment>>
         (WidgetType::SELECT, m_valueTreeState, parameterID, [&labels](juce::ComboBox& selector) {
@@ -106,8 +104,6 @@ std::unique_ptr<IWidgetWithLabel> WidgetPanel::createSelect(const std::string& p
             selector.addItem(item, ++index); // Add items with 1-based index
         }
     });
-
-    addAndMakeVisible(widgetWithLabel->widget);
 
     return widgetWithLabel;
 }

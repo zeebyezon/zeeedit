@@ -25,9 +25,9 @@ public:
 private:
     void populateWidgets(const settings::WidgetPanel& panel, MidiParameterMap& midiParameterMap);
 
-    std::unique_ptr<IWidgetWithLabel> createRotary(const std::string& parameterID);
-    std::unique_ptr<IWidgetWithLabel> createToggle(const std::string& parameterID);
-    std::unique_ptr<IWidgetWithLabel> createSelect(const std::string& parameterID, const std::vector<std::string>& labels);
+    std::unique_ptr<IWidgetWithLabel> createRotary(const std::string& parameterID) const;
+    std::unique_ptr<IWidgetWithLabel> createToggle(const std::string& parameterID) const;
+    std::unique_ptr<IWidgetWithLabel> createSelect(const std::string& parameterID, const std::vector<std::string>& labels) const;
 
 private:
     juce::Label m_panelLabel;
