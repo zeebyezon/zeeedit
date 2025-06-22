@@ -22,6 +22,8 @@ ZeeEditGui::ZeeEditGui(PluginProcessorBase& pluginProcessor, juce::AudioProcesso
     setSize(1140, 800); // Set a default size for the editor
     setResizable (true, false);
 
+    startTimer(100); // Start a timer to poll the input MIDI message queue
+
 #if JUCE_DEBUG
     m_inspector = std::make_unique<melatonin::Inspector>(*this);
     m_inspector->onClose = [this]() { m_inspector.reset(); };
@@ -46,7 +48,7 @@ void ZeeEditGui::resized()
     }
 }
 
-void ZeeEditGui::changeListenerCallback(juce::ChangeBroadcaster* /*source*/)
+void ZeeEditGui::timerCallback()
 {
     m_inputMidiMessageQueue.popAll([this](const juce::MidiBuffer& midiBuffer)
     {
