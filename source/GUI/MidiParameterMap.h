@@ -21,14 +21,9 @@ public:
     MidiParameterMap();
     ~MidiParameterMap();
 
-    void registerParameter(const settings::MidiConfig& midiConfig, const settings::ValueRange& valueRange, juce::RangedAudioParameter& parameter);
+    void registerParameter(const settings::MidiConfig& midiConfig, juce::RangedAudioParameter& parameter);
     void setParameterValue(const juce::MidiMessage& midiMessage) const;
 
 private:
-    struct MidiParameter
-    {
-        juce::RangedAudioParameter* parameter = nullptr;
-        float minValue = 0;
-    };
-    std::vector<std::vector<MidiParameter>> m_midiCcMap; // by channel, then by CC number
+    std::vector<std::vector<juce::RangedAudioParameter*>> m_midiCcMap; // by channel, then by CC number
 };

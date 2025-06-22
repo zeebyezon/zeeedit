@@ -17,6 +17,10 @@ ZeeEdit::~ZeeEdit() = default;
 juce::AudioProcessorValueTreeState::ParameterLayout ZeeEdit::createParameterLayout()
 {
     juce::AudioProcessorValueTreeState::ParameterLayout params;
+
+    params.add(std::make_unique<juce::AudioParameterInt>( "$globalMidiChannel", "Global MIDI Channel", 1,  16, 1));
+
+    // Add parameters for each widget in the panels
     for (const settings::WidgetPanel& panel : ParameterMap::getPanels())
     {
         for (const auto& widget : panel.widgets)
@@ -44,6 +48,18 @@ void ZeeEdit::createParameterListeners()
     }
 }
 
+int ZeeEdit::getGlobalMidiChannel() const
+{
+    const juce::RangedAudioParameter* parameter = m_parameters.getParameter("$globalMidiChannel");
+    if (parameter == nullptr)
+    {
+        return 1; // Default to channel 1 if parameter is not found
+    }
+
+    int globalChannel = static_cast<int>(parameter->convertFrom0to1(parameter->getValue()));
+    return (globalChannel >= 1 && globalChannel <= 16) ? globalChannel : 1; // Default to channel 1 if out of range
+}
+
 class ParameterListener : public juce::AudioProcessorValueTreeState::Listener
 {
 public:
@@ -58,7 +74,12 @@ public:
 
     void parameterChanged(const juce::String& /*parameterID*/, float newValue) override
     {
-        m_parent.pushOutputMessage(juce::MidiMessage::controllerEvent(m_channel, m_ccNumber, static_cast<int>(newValue)));
+        int channel = m_channel;
+        if (channel <= 0 || channel > 16)
+        {
+            channel = m_parent.getGlobalMidiChannel();
+        }
+        m_parent.pushOutputMessage(juce::MidiMessage::controllerEvent(channel, m_ccNumber, static_cast<int>(newValue)));
     }
 
 private:

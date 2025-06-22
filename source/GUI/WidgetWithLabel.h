@@ -2,6 +2,7 @@
 #pragma once
 
 #include <string>
+#include <functional>
 
 namespace juce {
 class Component;
