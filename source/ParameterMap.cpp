@@ -80,6 +80,11 @@ std::string ParameterMap::generateParameterID(const std::string& panelName, cons
     return out;
 }
 
+int ParameterMap::getBankSelectionMidiChannel()
+{
+    return ALL_CHANNELS;
+}
+
 std::string ParameterMap::removeSpaces(const std::string& input)
 {
     std::string output = input;

@@ -8,15 +8,16 @@ namespace melatonin {
 class Inspector;
 }
 
-class PluginProcessorBase;
+class ZeeEdit;
 class WidgetPanel;
+struct BankAndPG;
 template<class T> class ThreadSafeQueue;
 
 //==============================================================================
 class ZeeEditGui : public juce::AudioProcessorEditor, public juce::Timer
 {
 public:
-    ZeeEditGui(PluginProcessorBase& pluginProcessor, juce::AudioProcessorValueTreeState& valueTreeState, ThreadSafeQueue<juce::MidiBuffer>& inputMidiMessageQueue);
+    ZeeEditGui(ZeeEdit& pluginProcessor, juce::AudioProcessorValueTreeState& valueTreeState);
     ~ZeeEditGui() override;
 
     //==============================================================================
@@ -29,10 +30,12 @@ public:
 private:
     // Header
     WidgetWithLabel<juce::ComboBox, juce::Label, juce::AudioProcessorValueTreeState::ComboBoxAttachment> m_midiChannelSelector;
+    WidgetWithLabel<juce::ComboBox, juce::Label, juce::AudioProcessorValueTreeState::ComboBoxAttachment> m_programSelector;
 
     // Widgets
     std::vector<std::unique_ptr<WidgetPanel>> m_widgetPanels;
-    ThreadSafeQueue<juce::MidiBuffer>& m_inputMidiMessageQueue;
+    ThreadSafeQueue<juce::MidiMessage>& m_inputMidiMessageQueue;
+    ThreadSafeQueue<BankAndPG>& m_inputProgramChangeQueue;
     MidiParameterMap m_midiParameterMap;
 
     std::unique_ptr<melatonin::Inspector> m_inspector;

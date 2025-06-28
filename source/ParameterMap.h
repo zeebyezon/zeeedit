@@ -65,6 +65,16 @@ public:
     static const std::vector<settings::WidgetPanel>& getPanels();
     static std::string generateParameterID(const std::string& panelName, const std::string& widgetName);
 
+    constexpr static int GLOBAL_CHANNELS = 0; // Special value to indicate the global MIDI channel
+    constexpr static int ALL_CHANNELS = -1; // Special value to indicate all channels
+    constexpr static int DISABLE = -2; // Special value to disable bank selection
+
+    /**
+     * Get the midi channel to be used for bank selection.
+     * @return 1-based MIDI channel number (1-16), or GLOBAL_CHANNELS, or ALL_CHANNELS, or DISABLE.
+     */
+    static int getBankSelectionMidiChannel();
+
 private:
     static std::string removeSpaces(const std::string& input);
 };

@@ -49,7 +49,7 @@ struct WidgetWithLabel final : IWidgetWithLabel
     {}
 
     ~WidgetWithLabel() override = default;
-    [[nodiscard]] juce::Component& getComponent() override { return widget; }
+    [[nodiscard]] Component& getComponent() override { return widget; }
     [[nodiscard]] juce::Label& getLabel() override { return label; }
     [[nodiscard]] WidgetType getWidgetType() const override { return widgetType; }
 };

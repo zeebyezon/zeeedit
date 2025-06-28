@@ -7,7 +7,8 @@
 ZeeEdit::ZeeEdit() :
     m_parameters(*this, nullptr, "parameters", createParameterLayout()),
     m_outputMidiMessageQueue(64),
-    m_inputMidiMessageQueue(128)
+    m_inputMidiMessageQueue(128),
+    m_inputProgramChangeQueue(16)
 {
     createParameterListeners();
 }
@@ -19,6 +20,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout ZeeEdit::createParameterLayo
     juce::AudioProcessorValueTreeState::ParameterLayout params;
 
     params.add(std::make_unique<juce::AudioParameterInt>( "$globalMidiChannel", "Global MIDI Channel", 1,  16, 1));
+    params.add(std::make_unique<juce::AudioParameterInt>( "$programSelector", "Program bank and number", 1,  128 * 128 * 128, 1));
 
     // Add parameters for each widget in the panels
     for (const settings::WidgetPanel& panel : ParameterMap::getPanels())
@@ -60,6 +62,31 @@ int ZeeEdit::getGlobalMidiChannel() const
     return (globalChannel >= 1 && globalChannel <= 16) ? globalChannel : 1; // Default to channel 1 if out of range
 }
 
+int ZeeEdit::getNumPrograms()
+{
+    return 128; // 128 programs (0-127) for MIDI program changes
+}
+
+int ZeeEdit::getCurrentProgram()
+{
+    return -1; // Make sure it is always different from the value passed to the last call to setCurrentProgram
+}
+
+void ZeeEdit::setCurrentProgram(int index)
+{
+    // This function is called on the GUI thread, but it is simpler to use the same logic as in processMidiMessages
+    m_inputProgramChangeQueue.push(BankAndPG{m_receivedBankMsb, m_receivedBankLsb, index});
+}
+
+const juce::String ZeeEdit::getProgramName(int index)
+{
+    return juce::String(index + 1); // Return program number as string (1-based index)
+}
+
+void ZeeEdit::changeProgramName(int index, const juce::String& newName)
+{
+}
+
 class ParameterListener : public juce::AudioProcessorValueTreeState::Listener
 {
 public:
@@ -99,13 +126,49 @@ void ZeeEdit::pushOutputMessage(juce::MidiMessage message)
     m_outputMidiMessageQueue.push(std::move(message));
 }
 
+void ZeeEdit::sendProgramChange(int bankMsb, int bankLsb, int programNumber)
+{
+    const int midiChannel = getGlobalMidiChannel();
+    pushOutputMessage(juce::MidiMessage::controllerEvent(midiChannel, 0, bankMsb));
+    pushOutputMessage(juce::MidiMessage::controllerEvent(midiChannel, 32, bankLsb));
+    pushOutputMessage(juce::MidiMessage::programChange(midiChannel, programNumber));
+}
+
 void ZeeEdit::processMidiMessages(juce::MidiBuffer& midiMessages)
 {
     juce::MidiBuffer inputBuffer;
     midiMessages.swapWith(inputBuffer); // midiMessages is now the output buffer
     if (!inputBuffer.isEmpty())
     {
-        m_inputMidiMessageQueue.push(std::move(inputBuffer));
+        for (const juce::MidiMessageMetadata& midiMessageMetadata : inputBuffer)
+        {
+            juce::MidiMessage midiMessage = midiMessageMetadata.getMessage();
+
+            // Interpret bank and program change
+            int midiChannelForBankSelection = ParameterMap::getBankSelectionMidiChannel();
+            if (midiChannelForBankSelection == ParameterMap::ALL_CHANNELS ||
+                midiChannelForBankSelection == ParameterMap::GLOBAL_CHANNELS && midiMessage.getChannel() == getGlobalMidiChannel() ||
+                midiChannelForBankSelection != ParameterMap::DISABLE && midiMessage.getChannel() == midiChannelForBankSelection)
+            {
+                if (midiMessage.isProgramChange())
+                {
+                    m_inputProgramChangeQueue.push(BankAndPG{m_receivedBankMsb, m_receivedBankLsb, midiMessage.getProgramChangeNumber()});
+                    continue;
+                }
+                if (midiMessage.isController() && midiMessage.getControllerNumber() == 0) // Bank Select MSB
+                {
+                    m_receivedBankMsb = midiMessage.getControllerValue();
+                    continue;
+                }
+                else if (midiMessage.isController() && midiMessage.getControllerNumber() == 32) // Bank Select LSB
+                {
+                    m_receivedBankLsb = midiMessage.getControllerValue();
+                    continue;
+                }
+            }
+
+            m_inputMidiMessageQueue.push(std::move(midiMessage));
+        }
     }
 
     m_outputMidiMessageQueue.popAll([&midiMessages](const juce::MidiMessage& midiMessage)
@@ -123,5 +186,5 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 juce::AudioProcessorEditor* ZeeEdit::createEditor()
 {
-    return new ZeeEditGui(*this, m_parameters, m_inputMidiMessageQueue);
+    return new ZeeEditGui(*this, m_parameters);
 }
