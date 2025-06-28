@@ -54,33 +54,6 @@ double PluginProcessorBase::getTailLengthSeconds() const
     return 0.0;
 }
 
-int PluginProcessorBase::getNumPrograms()
-{
-    return 1; // NB: some hosts don't cope very well if you tell them there are 0 programs,
-    // so this should be at least 1, even if you're not really implementing programs.
-}
-
-int PluginProcessorBase::getCurrentProgram()
-{
-    return 0;
-}
-
-void PluginProcessorBase::setCurrentProgram(int index)
-{
-    juce::ignoreUnused(index);
-}
-
-const juce::String PluginProcessorBase::getProgramName(int index)
-{
-    juce::ignoreUnused(index);
-    return {};
-}
-
-void PluginProcessorBase::changeProgramName(int index, const juce::String& newName)
-{
-    juce::ignoreUnused(index, newName);
-}
-
 //==============================================================================
 void PluginProcessorBase::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
