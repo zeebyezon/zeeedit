@@ -14,7 +14,7 @@ struct BankAndPG;
 template<class T> class ThreadSafeQueue;
 
 //==============================================================================
-class ZeeEditGui : public juce::AudioProcessorEditor, public juce::AsyncUpdater
+class ZeeEditGui : public juce::AudioProcessorEditor, public juce::Timer
 {
 public:
     ZeeEditGui(ZeeEdit& pluginProcessor, juce::AudioProcessorValueTreeState& valueTreeState);
@@ -25,7 +25,7 @@ public:
     void resized() override;
 
     //==============================================================================
-    void handleAsyncUpdate() override;
+    void timerCallback() override;
 
 private:
     // Header
