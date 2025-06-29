@@ -5,6 +5,7 @@
 #include "ParameterMap.h"
 
 ZeeEdit::ZeeEdit() :
+    m_midiInputUpdater(nullptr),
     m_parameters(*this, nullptr, "parameters", createParameterLayout()),
     m_outputMidiMessageQueue(64),
     m_inputMidiMessageQueue(128),
@@ -76,6 +77,10 @@ void ZeeEdit::setCurrentProgram(int index)
 {
     // This function is called on the GUI thread, but it is simpler to use the same logic as in processMidiMessages
     m_inputProgramChangeQueue.push(BankAndPG{m_receivedBankMsb, m_receivedBankLsb, index});
+    if (m_midiInputUpdater)
+    {
+        m_midiInputUpdater->triggerAsyncUpdate();
+    }
 }
 
 const juce::String ZeeEdit::getProgramName(int index)
@@ -153,6 +158,10 @@ void ZeeEdit::processMidiMessages(juce::MidiBuffer& midiMessages)
                 if (midiMessage.isProgramChange())
                 {
                     m_inputProgramChangeQueue.push(BankAndPG{m_receivedBankMsb, m_receivedBankLsb, midiMessage.getProgramChangeNumber()});
+                    if (m_midiInputUpdater)
+                    {
+                        m_midiInputUpdater->triggerAsyncUpdate();
+                    }
                     continue;
                 }
                 if (midiMessage.isController() && midiMessage.getControllerNumber() == 0) // Bank Select MSB
@@ -168,6 +177,10 @@ void ZeeEdit::processMidiMessages(juce::MidiBuffer& midiMessages)
             }
 
             m_inputMidiMessageQueue.push(std::move(midiMessage));
+            if (m_midiInputUpdater)
+            {
+                m_midiInputUpdater->triggerAsyncUpdate();
+            }
         }
     }
 
@@ -186,5 +199,7 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 juce::AudioProcessorEditor* ZeeEdit::createEditor()
 {
-    return new ZeeEditGui(*this, m_parameters);
+    auto* gui = new ZeeEditGui(*this, m_parameters);
+    m_midiInputUpdater = gui;
+    return gui;
 }

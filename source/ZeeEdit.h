@@ -6,6 +6,7 @@
 #include "ThreadSafeQueue.h"
 
 namespace juce {
+class AsyncUpdater;
 class AudioProcessor;
 class AudioPlayHead;
 class MidiBuffer;
@@ -49,12 +50,13 @@ private:
     juce::AudioProcessorValueTreeState::Listener& createParameterListener(int channel, int ccNumber);
 
 private:
+    juce::AsyncUpdater* m_midiInputUpdater;
+
     juce::AudioProcessorValueTreeState m_parameters;
     std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::Listener>> m_parameterListeners;
     ThreadSafeQueue<juce::MidiMessage> m_outputMidiMessageQueue;
 
     ThreadSafeQueue<juce::MidiMessage> m_inputMidiMessageQueue;
-
     ThreadSafeQueue<BankAndPG> m_inputProgramChangeQueue;
     int m_receivedBankMsb = 0;
     int m_receivedBankLsb = 0;
