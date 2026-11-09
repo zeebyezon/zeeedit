@@ -40,7 +40,7 @@ jobs:
             pluginval-binary: ./pluginval
             extra-flags: -G Ninja
           - name: macOS
-            os: macos-14
+            os: macos-15
             pluginval-binary: pluginval.app/Contents/MacOS/pluginval
             extra-flags: -G Ninja -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
           - name: Windows
@@ -251,12 +251,13 @@ jobs:
           name: ${{ env.ARTIFACT_NAME }}.zip
           path: "${{ env.ARTIFACTS_PATH }}/${{ env.ARTIFACT_NAME }}.zip"
 
-      - name: Upload pkg (macOS)
+      # The .pkg step is commented out above, so upload the built VST3 instead
+      - name: Upload VST3 (macOS)
         if: ${{ matrix.name == 'macOS' }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.ARTIFACT_NAME }}.pkg
-          path: packaging/${{ env.ARTIFACT_NAME }}.pkg
+          name: ${{ env.ARTIFACT_NAME }}.vst3
+          path: ${{ env.VST3_PATH }}
 
   release:
     if: contains(github.ref, 'tags/v')
