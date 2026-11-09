@@ -8,7 +8,7 @@ Testing
 .idea
 
 # clion cmake builds
-/cmake-build-*
+/cmake-build*
 
 # Test project backups
 /tests/ReaperTestProject/Backups/

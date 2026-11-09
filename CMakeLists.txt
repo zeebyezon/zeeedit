@@ -49,9 +49,18 @@ add_subdirectory(JUCE)
 # Add CLAP format
 add_subdirectory(modules/clap-juce-extensions EXCLUDE_FROM_ALL)
 
-# Customize the installation path
-set_directory_properties(PROPERTIES JUCE_VST_COPY_DIR "D:/Studio/VST-mine")
-set_directory_properties(PROPERTIES JUCE_VST3_COPY_DIR "D:/Studio/VST-mine")
+# Copy the plugin to the plugin folders after each build.
+# Enable with -DZEEEDIT_COPY_PLUGIN_AFTER_BUILD=ON
+option(ZEEEDIT_COPY_PLUGIN_AFTER_BUILD "Copy the plugin after build" OFF)
+
+# Customize the installation path (optional).
+# Pass e.g. -DZEEEDIT_VST_COPY_DIR="D:/Studio/VST-mine" at configure time.
+# If left empty, JUCE's default plugin folders are used.
+set(ZEEEDIT_VST_COPY_DIR "" CACHE PATH "Where to copy the VST/VST3 plugin after build")
+if(ZEEEDIT_VST_COPY_DIR)
+    set_directory_properties(PROPERTIES JUCE_VST_COPY_DIR "${ZEEEDIT_VST_COPY_DIR}")
+    set_directory_properties(PROPERTIES JUCE_VST3_COPY_DIR "${ZEEEDIT_VST_COPY_DIR}")
+endif()
 
 # Add any other modules you want modules here, before the juce_add_plugin call
 # juce_add_module(modules/my_module)
@@ -73,7 +82,7 @@ juce_add_plugin("${PROJECT_NAME}"
     BUNDLE_ID "${BUNDLE_ID}"
 
     # On MacOS, plugin is copied to /Users/yourname/Library/Audio/Plug-Ins/
-    COPY_PLUGIN_AFTER_BUILD TRUE
+    COPY_PLUGIN_AFTER_BUILD ${ZEEEDIT_COPY_PLUGIN_AFTER_BUILD}
 
     # Change me!
     # A four-character plugin id
