@@ -205,11 +205,12 @@ jobs:
         working-directory: ${{ env.ARTIFACTS_PATH }}
         run: 7z a -tzip "${{ env.ARTIFACT_NAME }}.zip" "-xr!lib${{ env.PRODUCT_NAME }}_SharedCode.a" .
 
-      - name: Generate Installer
+      # Windows ships the raw VST3 bundle (no installer). To go back to an Inno Setup
+      # installer, run `iscc packaging\installer.iss` here instead.
+      - name: Zip VST3 (Windows)
         if: ${{ matrix.name == 'Windows' }}
-        run: |
-          iscc "packaging\installer.iss"
-          mv "packaging/Output/${{ env.ARTIFACT_NAME }}.exe" "${{ env.ARTIFACTS_PATH }}/"
+        working-directory: ${{ env.ARTIFACTS_PATH }}/VST3
+        run: 7z a -tzip "${{ env.ARTIFACT_NAME }}.zip" "-xr!*.ilk" "${{ env.PRODUCT_NAME }}.vst3"
 
 #      - name: Codesign with Azure Trusted Signing
 #        if: ${{ matrix.name == 'Windows' }}
@@ -237,12 +238,12 @@ jobs:
 #          files-folder: ${{ env.ARTIFACTS_PATH }}
 #          files-folder-filter: exe
 
-      - name: Upload Exe (Windows)
+      - name: Upload Zip (Windows)
         if: ${{ matrix.name == 'Windows' }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.ARTIFACT_NAME }}.exe
-          path: "${{ env.ARTIFACTS_PATH }}/${{ env.ARTIFACT_NAME }}.exe"
+          name: ${{ env.ARTIFACT_NAME }}.zip
+          path: "${{ env.ARTIFACTS_PATH }}/VST3/${{ env.ARTIFACT_NAME }}.zip"
 
       - name: Upload Zip (Linux)
         if: ${{ matrix.name == 'Linux' }}
