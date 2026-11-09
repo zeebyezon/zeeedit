@@ -251,13 +251,19 @@ jobs:
           name: ${{ env.ARTIFACT_NAME }}.zip
           path: "${{ env.ARTIFACTS_PATH }}/${{ env.ARTIFACT_NAME }}.zip"
 
-      # The .pkg step is commented out above, so upload the built VST3 instead
-      - name: Upload VST3 (macOS)
+      # The .pkg step is commented out above, so zip the built VST3 instead.
+      # Zipping is required: the custom-icon file "Icon\r" has a carriage return
+      # in its name, which upload-artifact rejects.
+      - name: Zip VST3 (macOS)
+        if: ${{ matrix.name == 'macOS' }}
+        run: ditto -c -k --keepParent "${{ env.VST3_PATH }}" "${{ env.ARTIFACT_NAME }}.vst3.zip"
+
+      - name: Upload VST3 zip (macOS)
         if: ${{ matrix.name == 'macOS' }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.ARTIFACT_NAME }}.vst3
-          path: ${{ env.VST3_PATH }}
+          name: ${{ env.ARTIFACT_NAME }}.vst3.zip
+          path: ${{ env.ARTIFACT_NAME }}.vst3.zip
 
   release:
     if: contains(github.ref, 'tags/v')
