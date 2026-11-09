@@ -1,0 +1,5 @@
+{
+  "cmake.buildDirectory": "${workspaceFolder}/cmake-build",
+  "cmake.generator": "Visual Studio 17 2022",
+  "cmake.configureArgs": ["-DZEEEDIT_COPY_PLUGIN_AFTER_BUILD=OFF"]
+}
